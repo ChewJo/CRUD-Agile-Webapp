@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+    <title>Login</title>
+</head>
+<body>
+    <form id="user-form" class="loginContainer" action="/login" method="post">
+        <h2>JB Systems IT Management</h2>
+        
+        <div class="form-item">
+            <label for="user-username">Username:</label>
+            <input id="user-username" class="form-input" type="text" name="username" required>
+        </div>
+        
+        <div class="form-item">
+            <label for="user-password">Password:</label>
+            <input id="user-password" class="form-input" type="password" name="password" required>
+        </div>
+        
+        <div id="remember-me-container">
+            <input type="checkbox" id="remember-me" name="remember-me">
+            <label for="remember-me">Remember me</label>
+        </div>
+
+        <input id="form-submit" type="submit" value="Login">
+
+        <div id="switch-form">
+            <p>Don't have an account? <a class="text-link" href="/register">Register</a></p>
+        </div>
+
+        <!-- Error message placeholder -->
+        {% if error %}<p id="error-msg">{{error}}</p>{% endif %}
+    </form>
+</body>
+</html>
