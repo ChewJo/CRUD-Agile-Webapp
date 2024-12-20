@@ -27,3 +27,11 @@ $ flask run
 # Link to Live App https://obnoxious-urial-noorgtest-af782b35.koyeb.app/
 # Link to Live App https://obnoxious-urial-noorgtest-af782b35.koyeb.app/
 # Link to Live App https://obnoxious-urial-noorgtest-af782b35.koyeb.app/
+
+# Login Information
+
+User Account: Bob, Password: Bob.
+
+Admin Account: Admin, Password: Admin.
+
+Feel free to create your own account, and edit data.
