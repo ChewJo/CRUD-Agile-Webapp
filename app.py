@@ -54,12 +54,6 @@ def index():
 @app.route('/add_asset', methods=['POST'])
 @login_required
 def add_asset():
-
-    
-    # Only admin can add assets
-    if session.get('role') != 'admin':
-        return jsonify({"error": "Access Denied"}), 403
-    
     name = request.form.get('name')
     description = request.form.get('description')
     status = request.form.get('status')
@@ -92,14 +86,41 @@ def add_asset():
 @app.route('/edit_asset/<int:asset_id>', methods=['POST'])
 @login_required
 def edit_asset(asset_id):
-    # Only admin can edit assets
-    if session.get('role') != 'admin':
-        return jsonify({"error": "Access Denied"}), 403
+    # Get the current user's information
+    current_username = session.get('username')
+    current_role = session.get('role')
+    
+    # First, check if the user has permission to edit this asset
+    query = '''
+    SELECT assets.*, users.username as allocated_to_username 
+    FROM assets 
+    LEFT JOIN users ON assets.allocated_to = users.id 
+    WHERE assets.id = ?
+    '''
+    
+    with contextlib.closing(sqlite3.connect(users_connection_string)) as conn:
+        with conn:
+            asset = conn.execute(query, (asset_id,)).fetchone()
+    
+    if not asset:
+        return jsonify({"error": "Asset not found"}), 404
+        
+    # Check permissions
+    if current_role != 'admin':
+        # Regular users can only edit unallocated assets or assets allocated to them
+        if asset[-1] and asset[-1] != current_username:  # asset[-1] is allocated_to_username
+            return jsonify({"error": "Access Denied"}), 403
     
     name = request.form.get('name')
     description = request.form.get('description')
     status = request.form.get('status')
-    allocated_to = request.form.get('allocated_to')
+    
+    # Only admins can change allocation
+    if current_role == 'admin':
+        allocated_to = request.form.get('allocated_to')
+    else:
+        # Regular users maintain the current allocation
+        allocated_to = asset[4]  # Keep existing allocation
     
     # Validate inputs
     if not name or not status:
@@ -251,4 +272,4 @@ def register():
     return redirect('/')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=8000)
